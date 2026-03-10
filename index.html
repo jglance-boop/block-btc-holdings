@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block's Bitcoin Holdings Over Time</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-2: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --text-muted: #8888a0;
+      --accent: #f7931a;
+      --accent-dim: rgba(247, 147, 26, 0.15);
+      --green: #00d67e;
+      --red: #ff4d6a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .btc-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 22px;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-top: 6px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.green { color: var(--green); }
+
+    .stat-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .chart-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px 20px;
+      margin-bottom: 36px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .chart-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .chart-canvas-container {
+      position: relative;
+      width: 100%;
+      height: 480px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+
+    .toggle-group {
+      display: flex;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .toggle-btn {
+      padding: 6px 18px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .toggle-btn:hover { color: var(--text); }
+
+    .toggle-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .timeline {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+    }
+
+    .timeline h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 20px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .timeline-item:last-child { border-bottom: none; }
+
+    .timeline-date {
+      min-width: 110px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding-top: 2px;
+    }
+
+    .timeline-content {
+      flex: 1;
+    }
+
+    .timeline-amount {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .timeline-detail {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 32px 0 16px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.5rem; }
+      .chart-canvas-container { height: 300px; }
+      .timeline-item { flex-direction: column; gap: 4px; }
+      .container { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-row">
+        <div class="btc-icon">&#8383;</div>
+        <h1>Block's <span>Bitcoin</span> Treasury</h1>
+      </div>
+      <p class="subtitle">Corporate BTC holdings from first purchase to today</p>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Holdings</div>
+        <div class="stat-value accent">8,883 BTC</div>
+        <div class="stat-sub">As of Feb 2026</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Cost Basis</div>
+        <div class="stat-value">$292.6M</div>
+        <div class="stat-sub">Avg ~$32,939 / BTC</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Current Value</div>
+        <div class="stat-value">__CURRENT_VALUE__</div>
+        <div class="stat-sub">__CURRENT_PRICE_LABEL__</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Unrealized Gain</div>
+        <div class="stat-value green">__CURRENT_GAIN_PCT__</div>
+        <div class="stat-sub">__CURRENT_GAIN_AMT__</div>
+      </div>
+    </div>
+
+    <div class="chart-wrapper">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">BTC Holdings Over Time — By Acquisition Type</div>
+          <div class="chart-legend" style="margin-top:10px">
+            <div class="legend-item"><div class="legend-swatch" style="background:#5B93D3"></div>Initial Purchases</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#F7931A"></div>DCA Program</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#A855F7"></div>Lightning Node Yield</div>
+            <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="border:2px dashed #00d67e;background:none"></div>Cumulative Cost Basis</div>
+          </div>
+        </div>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="btn-btc" onclick="toggle('btc')">BTC</button>
+          <button class="toggle-btn" id="btn-usd" onclick="toggle('usd')">USD</button>
+        </div>
+      </div>
+      <div class="chart-canvas-container">
+        <canvas id="holdingsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <h2>Acquisition Timeline</h2>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Oct 8, 2020</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">+4,709 BTC <span class="badge">Initial Purchase</span></div>
+          <div class="timeline-detail">$50M investment at ~$10,618 per BTC. Block (then Square) becomes one of the first public companies to hold Bitcoin on its balance sheet.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 23, 2021</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">+3,318 BTC</div>
+          <div class="timeline-detail">$170M investment at ~$51,236 per BTC. Total holdings reach ~8,027 BTC.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2021 &ndash; 2023</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">~8,027 BTC (held steady)</div>
+          <div class="timeline-detail">No major purchases during this period. Block holds through the bear market. Lightning node accumulates ~11 BTC in routing yield.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Apr 2024</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">DCA program begins <span class="badge">Strategy Shift</span></div>
+          <div class="timeline-detail">Block starts investing 10% of monthly gross profit from Bitcoin products into BTC purchases via dollar-cost averaging. Lightning node yield also begins being formally tracked.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Q2 2024</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">+173 BTC</div>
+          <div class="timeline-detail">Holdings reach 8,211 BTC by June 30, 2024.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Q3 2024</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">+152 BTC</div>
+          <div class="timeline-detail">Holdings reach 8,363 BTC by September 30, 2024.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Q4 2024</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">+122 BTC</div>
+          <div class="timeline-detail">Holdings reach 8,485 BTC by December 31, 2024.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Q1 2025</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">+99 BTC</div>
+          <div class="timeline-detail">Holdings reach 8,584 BTC by March 31, 2025.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Q2&ndash;Q3 2025</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">+108 BTC</div>
+          <div class="timeline-detail">Holdings reach 8,692 BTC by August 2025.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 2026</div>
+        <div class="timeline-content">
+          <div class="timeline-amount">8,883 BTC <span class="badge">Current</span></div>
+          <div class="timeline-detail">Initial: 8,027 BTC | DCA: ~833 BTC | Lightning Node Yield: ~23 BTC. Cost basis $292.6M. An additional 238 BTC held for Cash App operations.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Data sourced from Block's SEC filings, shareholder letters, and public disclosures. Price updated __LAST_UPDATED__.
+    </footer>
+  </div>
+
+  <script>
+    Chart.register(ChartDataLabels);
+
+    let mode = 'btc';
+
+    const labels = [
+      "Q4'20", "Q1'21", "Q4'21", "Q4'22", "Q4'23",
+      "Q1'24", "Q2'24", "Q3'24", "Q4'24",
+      "Q1'25", "Q2'25", "Q3'25", "Q4'25", "__CURRENT_LABEL__"
+    ];
+
+    // End-of-period BTC price (USD)
+    const btcPrice = [
+      29001, 58918, 46306, 16547, 42265,
+      69702, 60864, 65664, 92627,
+      82356, 108397, 114309, 88445, __CURRENT_BTC_PRICE__
+    ];
+
+    // --- BTC amounts by acquisition type ---
+    // Initial: 4,709 BTC (Oct 2020) + 3,318 BTC (Feb 2021) = 8,027 BTC
+    // Lightning Node Yield: ~11 BTC pre-tracked organic accumulation (2021–Q1'24),
+    //   plus MBR-tracked node yield starting May 2024 (~0.25 → 10.8 BTC by Sep'25)
+    // DCA: 10% of monthly BTC gross profit reinvested (started Apr 2024)
+
+    const btcData = {
+      initial:   [4709, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027],
+      dca:       [0,    0,    0,    0,    0,    0,    173,  324,  444,  541,  646,  746,  833,  833],
+      lightning: [0,    0,    0,    0,    0,    11,   11,   12,   14,   16,   19,   22,   23,   23],
+    };
+
+    const usdData = {
+      initial:   btcData.initial.map((v, i) => v * btcPrice[i]),
+      dca:       btcData.dca.map((v, i) => v * btcPrice[i]),
+      lightning: btcData.lightning.map((v, i) => v * btcPrice[i]),
+    };
+
+    const btcTotals = labels.map((_, i) => btcData.initial[i] + btcData.dca[i] + btcData.lightning[i]);
+    const usdTotals = labels.map((_, i) => usdData.initial[i] + usdData.dca[i] + usdData.lightning[i]);
+
+    // Cumulative cost basis ($ actually invested) from MBR + public filings
+    const costBasis = [
+      50000000,    // Q4'20: initial $50M purchase
+      220099426,   // Q1'21: + $170M second purchase
+      220099426,   // Q4'21: no new investment
+      220099426,   // Q4'22: held through bear market
+      220099426,   // Q4'23: still holding
+      220099426,   // Q1'24: DCA not yet started
+      231479426,   // Q2'24: DCA begins
+      241129426,   // Q3'24
+      251359426,   // Q4'24
+      260679426,   // Q1'25
+      271499426,   // Q2'25
+      281299426,   // Q3'25
+      291000000,   // Q4'25
+      292600000,   // Mar'26*
+    ];
+
+    function fmtUsd(v) {
+      if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+      if (v >= 1e6) return '$' + (v / 1e6).toFixed(0) + 'M';
+      if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+      return '$' + v.toFixed(0);
+    }
+
+    function fmtLabel(v) {
+      return mode === 'btc' ? v.toLocaleString() : fmtUsd(v);
+    }
+
+    const ctx = document.getElementById('holdingsChart').getContext('2d');
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Initial Purchases',
+            data: [...btcData.initial],
+            backgroundColor: '#5B93D3',
+          },
+          {
+            label: 'Lightning Node Yield',
+            data: [...btcData.lightning],
+            backgroundColor: '#A855F7',
+          },
+          {
+            label: 'DCA Program',
+            data: [...btcData.dca],
+            backgroundColor: '#F7931A',
+            borderRadius: { topLeft: 4, topRight: 4 },
+          },
+          {
+            type: 'line',
+            label: 'Cost Basis ($ Invested)',
+            data: labels.map(() => null),
+            borderColor: '#00d67e',
+            borderWidth: 2.5,
+            borderDash: [8, 4],
+            pointBackgroundColor: '#00d67e',
+            pointBorderColor: '#00d67e',
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: false,
+            tension: 0.2,
+            hidden: true,
+            datalabels: { display: false },
+          },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        scales: {
+          x: {
+            stacked: true,
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#8888a0', font: { size: 12, weight: '500' } },
+            border: { color: 'rgba(255,255,255,0.08)' },
+          },
+          y: {
+            stacked: true,
+            min: 0,
+            max: 10000,
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: {
+              color: '#8888a0',
+              font: { size: 12 },
+              callback: v => mode === 'btc' ? v.toLocaleString() : fmtUsd(v),
+              stepSize: 2000,
+            },
+            border: { color: 'rgba(255,255,255,0.08)' },
+            title: {
+              display: true,
+              text: 'BTC',
+              color: '#8888a0',
+              font: { size: 13, weight: '500' },
+            },
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          datalabels: {
+            display: (ctx) => ctx.datasetIndex === 2,
+            anchor: 'end',
+            align: 'end',
+            offset: 2,
+            color: '#c8c8d8',
+            font: { size: 11, weight: '600' },
+            formatter: (_, ctx) => {
+              const t = mode === 'btc' ? btcTotals : usdTotals;
+              return fmtLabel(t[ctx.dataIndex]);
+            },
+          },
+          tooltip: {
+            backgroundColor: '#1a1a26',
+            borderColor: '#3a3a4a',
+            borderWidth: 1,
+            titleColor: '#e8e8f0',
+            bodyColor: '#e8e8f0',
+            padding: 14,
+            cornerRadius: 10,
+            callbacks: {
+              afterTitle: (items) => {
+                return 'BTC Price: $' + btcPrice[items[0].dataIndex].toLocaleString();
+              },
+              label: (ctx) => {
+                if (ctx.parsed.y === 0) return null;
+                const suffix = mode === 'btc' ? ' BTC' : '';
+                const val = mode === 'btc'
+                  ? ctx.parsed.y.toLocaleString() + suffix
+                  : fmtUsd(ctx.parsed.y);
+                return ctx.dataset.label + ': ' + val;
+              },
+              afterBody: (items) => {
+                const i = items[0].dataIndex;
+                const t = mode === 'btc' ? btcTotals : usdTotals;
+                const val = mode === 'btc'
+                  ? t[i].toLocaleString() + ' BTC'
+                  : fmtUsd(t[i]);
+                let lines = ['\nMarket Value: ' + val];
+                if (mode === 'usd') {
+                  const cb = costBasis[i];
+                  const gain = usdTotals[i] - cb;
+                  const pct = ((gain / cb) * 100).toFixed(1);
+                  lines.push('Cost Basis: ' + fmtUsd(cb));
+                  lines.push('Gain/Loss: ' + (gain >= 0 ? '+' : '') + fmtUsd(gain) + ' (' + pct + '%)');
+                }
+                return lines;
+              },
+            }
+          }
+        }
+      }
+    });
+
+    function toggle(newMode) {
+      mode = newMode;
+      const d = mode === 'btc' ? btcData : usdData;
+      const costDs = chart.data.datasets[3];
+
+      chart.data.datasets[0].data = [...d.initial];
+      chart.data.datasets[1].data = [...d.lightning];
+      chart.data.datasets[2].data = [...d.dca];
+
+      if (mode === 'btc') {
+        chart.options.scales.y.max = 10000;
+        chart.options.scales.y.ticks.stepSize = 2000;
+        chart.options.scales.y.title.text = 'BTC';
+        costDs.data = labels.map(() => null);
+        costDs.hidden = true;
+      } else {
+        const maxUsd = Math.max(...usdTotals);
+        chart.options.scales.y.max = Math.ceil(maxUsd / 2e8) * 2e8;
+        chart.options.scales.y.ticks.stepSize = 2e8;
+        chart.options.scales.y.title.text = 'USD (Market Value)';
+        costDs.data = [...costBasis];
+        costDs.hidden = false;
+      }
+
+      chart.update();
+
+      document.getElementById('btn-btc').classList.toggle('active', mode === 'btc');
+      document.getElementById('btn-usd').classList.toggle('active', mode === 'usd');
+      document.getElementById('legend-cost').style.display = mode === 'usd' ? 'flex' : 'none';
+    }
+  </script>
+</body>
+</html>
