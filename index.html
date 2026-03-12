@@ -204,63 +204,98 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
 
-    .timeline {
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-
-    .timeline {
+    .acq-table-wrap {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 28px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      overflow-x: auto;
     }
 
-    .timeline h2 {
+    .acq-table-wrap h2 {
       font-size: 1.1rem;
       font-weight: 600;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    .timeline-item {
-      display: flex;
-      gap: 20px;
-      padding: 16px 0;
+    .acq-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .acq-table thead th {
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      padding: 8px 12px 12px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .acq-table thead th:first-child { padding-left: 0; }
+
+    .acq-table thead th.col-lump { color: #5B93D3; }
+    .acq-table thead th.col-dca { color: #16a34a; }
+    .acq-table thead th.col-ln { color: #b8960c; }
+
+    .acq-table tbody td {
+      padding: 12px 12px;
       border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5;
     }
 
-    .timeline-item:last-child { border-bottom: none; }
+    .acq-table tbody td:first-child { padding-left: 0; }
 
-    .timeline-date {
-      min-width: 110px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      padding-top: 2px;
-    }
+    .acq-table tbody tr:last-child td { border-bottom: none; }
 
-    .timeline-content {
-      flex: 1;
-    }
-
-    .timeline-amount {
+    .acq-table .period {
       font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 4px;
+      color: var(--text);
+      white-space: nowrap;
+      min-width: 90px;
     }
 
-    .timeline-detail {
-      font-size: 0.85rem;
+    .acq-table .amt {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .acq-table .detail {
       color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+
+    .acq-table .empty { color: var(--text-muted); opacity: 0.4; }
+
+    .acq-table .total-row td {
+      border-top: 2px solid var(--border);
+      font-weight: 700;
+      padding-top: 14px;
+      font-size: 0.9rem;
     }
 
     .badge {
       display: inline-block;
       background: #eef2ff;
       color: #4338ca;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 20px;
-      margin-left: 8px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 700px) {
+      .acq-table { font-size: 0.78rem; }
+      .acq-table thead th, .acq-table tbody td { padding: 8px 6px; }
     }
 
     footer {
@@ -344,104 +379,167 @@
       </div>
     </div>
 
-    <div class="timeline">
+    <div class="acq-table-wrap">
       <h2>Acquisition Timeline</h2>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Pre-2020</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">9 BTC (pre-existing)</div>
-          <div class="timeline-detail">Small BTC balance already on Block's books, likely from early Cash App operations or testing. Cost basis ~$100K.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Oct 8, 2020</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">+4,710 BTC <span class="badge">Initial Purchase</span></div>
-          <div class="timeline-detail">$50M investment at ~$10,616 per BTC. Block (then Square) becomes one of the first public companies to hold Bitcoin on its balance sheet. Treasury reaches 4,719 BTC.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Feb 23, 2021</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">+3,319 BTC</div>
-          <div class="timeline-detail">$170M investment at ~$51,221 per BTC. Total lump-sum holdings reach 8,038 BTC. Cost basis $220.1M.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">2021 &ndash; 2023</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">8,038 BTC (held steady)</div>
-          <div class="timeline-detail">No new purchases during this period. Block holds through the bear market. Lightning node is operating but yield is not yet formally tracked.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Apr 2024</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">DCA + Lightning tracking begins <span class="badge">Strategy Shift</span></div>
-          <div class="timeline-detail">Block starts investing 10% of monthly gross profit from Bitcoin products into BTC via DCA. Lightning node yield begins formal MBR tracking. Node has ~73 BTC in channel liquidity (allocated from treasury).</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Q2 2024</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">DCA: +173 BTC | LN Yield: ~$15K</div>
-          <div class="timeline-detail">Holdings reach 8,211 BTC. Lightning node generates ~$15K in routing fees across Cash App and external channels.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Q3 2024</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">DCA: +151 BTC | LN Yield: ~$70K (+1 BTC)</div>
-          <div class="timeline-detail">Holdings reach 8,363 BTC. Lightning yield accelerates as routing volume grows across both internal and external channels.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Q4 2024</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">DCA: +120 BTC | LN Yield: ~$131K (+2 BTC)</div>
-          <div class="timeline-detail">Holdings reach 8,485 BTC. Lightning yield hits ~$52K/month in December as BTC price and network activity surge.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Q1 2025</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">DCA: +97 BTC | LN Yield: ~$201K (+2 BTC)</div>
-          <div class="timeline-detail">Holdings reach 8,584 BTC. Lightning monthly yield reaches ~$77K in March. Cumulative node yield surpasses $423K.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Q2 2025</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">DCA: +106 BTC | LN Yield: ~$275K (+3 BTC)</div>
-          <div class="timeline-detail">Holdings reach 8,693 BTC. Lightning yield crosses $100K/month in June. Cumulative yield surpasses $860K.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Q3 2025</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">DCA: +85 BTC | LN Yield: ~$325K (+3 BTC)</div>
-          <div class="timeline-detail">Holdings reach 8,781 BTC. Lightning node yield exceeds $1.2M cumulative. September sees $135K yield from strong external routing.</div>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">Feb 2026</div>
-        <div class="timeline-content">
-          <div class="timeline-amount">8,883 BTC <span class="badge">Current</span></div>
-          <div class="timeline-detail">Lump Sum: 8,038 BTC (incl. 9 pre-existing) | DCA: ~833 BTC | Lightning Yield: ~12 BTC. Cost basis $292.6M. Additional 238 BTC held for Cash App operations.</div>
-        </div>
-      </div>
+      <table class="acq-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="col-lump">Lump Sum</th>
+            <th class="col-dca">DCA Program</th>
+            <th class="col-ln">Lightning Yield</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="period">Pre-2020</td>
+            <td>
+              <div class="amt">9 BTC</div>
+              <div class="detail">Pre-existing balance, ~$100K cost basis</div>
+            </td>
+            <td class="empty">&mdash;</td>
+            <td class="empty">&mdash;</td>
+            <td class="amt">9</td>
+          </tr>
+          <tr>
+            <td class="period">Oct 2020</td>
+            <td>
+              <div class="amt">+4,710 BTC <span class="badge">$50M</span></div>
+              <div class="detail">~$10,616 / BTC. First public company BTC purchase.</div>
+            </td>
+            <td class="empty">&mdash;</td>
+            <td class="empty">&mdash;</td>
+            <td class="amt">4,719</td>
+          </tr>
+          <tr>
+            <td class="period">Feb 2021</td>
+            <td>
+              <div class="amt">+3,319 BTC <span class="badge">$170M</span></div>
+              <div class="detail">~$51,221 / BTC. Cost basis reaches $220.1M.</div>
+            </td>
+            <td class="empty">&mdash;</td>
+            <td class="empty">&mdash;</td>
+            <td class="amt">8,038</td>
+          </tr>
+          <tr>
+            <td class="period">2021&ndash;2023</td>
+            <td>
+              <div class="detail">Held steady through bear market</div>
+            </td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="detail">Node operating, yield not yet tracked</div>
+            </td>
+            <td class="amt">8,038</td>
+          </tr>
+          <tr>
+            <td class="period">Q1 2024</td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="amt">Program launches <span class="badge">Apr</span></div>
+              <div class="detail">10% of monthly BTC gross profit</div>
+            </td>
+            <td>
+              <div class="amt">Tracking begins</div>
+              <div class="detail">~73 BTC in channel liquidity</div>
+            </td>
+            <td class="amt">8,038</td>
+          </tr>
+          <tr>
+            <td class="period">Q2 2024</td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="amt">+173 BTC</div>
+              <div class="detail">Cumulative: 173 BTC ($7.9M invested)</div>
+            </td>
+            <td>
+              <div class="amt">~$15K yield</div>
+              <div class="detail">Cumulative: &lt;1 BTC</div>
+            </td>
+            <td class="amt">8,211</td>
+          </tr>
+          <tr>
+            <td class="period">Q3 2024</td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="amt">+151 BTC</div>
+              <div class="detail">Cumulative: 324 BTC ($17.7M)</div>
+            </td>
+            <td>
+              <div class="amt">~$70K yield (+1 BTC)</div>
+              <div class="detail">Cumulative: 1 BTC</div>
+            </td>
+            <td class="amt">8,363</td>
+          </tr>
+          <tr>
+            <td class="period">Q4 2024</td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="amt">+120 BTC</div>
+              <div class="detail">Cumulative: 444 BTC ($27.3M)</div>
+            </td>
+            <td>
+              <div class="amt">~$131K yield (+2 BTC)</div>
+              <div class="detail">Cumulative: 3 BTC. $52K/mo in Dec.</div>
+            </td>
+            <td class="amt">8,485</td>
+          </tr>
+          <tr>
+            <td class="period">Q1 2025</td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="amt">+97 BTC</div>
+              <div class="detail">Cumulative: 541 BTC ($37.9M)</div>
+            </td>
+            <td>
+              <div class="amt">~$201K yield (+2 BTC)</div>
+              <div class="detail">Cumulative: 5 BTC ($423K total)</div>
+            </td>
+            <td class="amt">8,584</td>
+          </tr>
+          <tr>
+            <td class="period">Q2 2025</td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="amt">+106 BTC</div>
+              <div class="detail">Cumulative: 647 BTC ($47.6M)</div>
+            </td>
+            <td>
+              <div class="amt">~$275K yield (+3 BTC)</div>
+              <div class="detail">Cumulative: 8 BTC ($860K). $100K/mo.</div>
+            </td>
+            <td class="amt">8,693</td>
+          </tr>
+          <tr>
+            <td class="period">Q3 2025</td>
+            <td class="empty">&mdash;</td>
+            <td>
+              <div class="amt">+85 BTC</div>
+              <div class="detail">Cumulative: 732 BTC ($58.2M)</div>
+            </td>
+            <td>
+              <div class="amt">~$325K yield (+3 BTC)</div>
+              <div class="detail">Cumulative: 11 BTC ($1.2M). $135K in Sep.</div>
+            </td>
+            <td class="amt">8,781</td>
+          </tr>
+          <tr class="total-row">
+            <td class="period">Feb 2026 <span class="badge">Current</span></td>
+            <td class="amt">8,038 BTC</td>
+            <td class="amt">~833 BTC</td>
+            <td class="amt">~12 BTC</td>
+            <td class="amt">8,883 BTC</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="detail">Cost: $220.1M</td>
+            <td class="detail">Cost: ~$72.5M</td>
+            <td class="detail">Cost: $0 (routing fees)</td>
+            <td class="detail">Cost: $292.6M</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <footer>
