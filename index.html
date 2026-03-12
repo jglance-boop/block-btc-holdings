@@ -156,6 +156,22 @@
       border-radius: 3px;
     }
 
+    .legend-item.clickable {
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+
+    .legend-item.clickable:hover { opacity: 0.7; }
+
+    .legend-item.dimmed {
+      opacity: 0.3;
+    }
+
+    .legend-item.dimmed .legend-swatch {
+      background: #ccc !important;
+    }
+
     .toggle-group {
       display: flex;
       background: var(--surface-2);
@@ -305,10 +321,10 @@
         <div>
           <div class="chart-title">Corporate Treasury Holdings — By Acquisition Type</div>
           <div class="chart-legend" style="margin-top:10px">
-            <div class="legend-item"><div class="legend-swatch" style="background:#5B93D3"></div>Lump Sum Purchases</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#16a34a"></div>DCA Program</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#FACC15"></div>Lightning Node Yield</div>
-            <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #F97316;border-radius:50%"></div>Cumulative Cost Basis</div>
+            <div class="legend-item clickable" id="legend-initial" onclick="toggleDataset('initial')"><div class="legend-swatch" style="background:#5B93D3"></div>Lump Sum Purchases</div>
+            <div class="legend-item clickable" id="legend-dca" onclick="toggleDataset('dca')"><div class="legend-swatch" style="background:#16a34a"></div>DCA Program</div>
+            <div class="legend-item clickable" id="legend-lightning" onclick="toggleDataset('lightning')"><div class="legend-swatch" style="background:#FACC15"></div>Lightning Node Yield</div>
+            <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #F97316;border-radius:50%"></div>Cost Basis (visible)</div>
           </div>
         </div>
         <div class="toggle-group">
@@ -318,26 +334,6 @@
       </div>
       <div class="chart-canvas-container">
         <canvas id="holdingsChart"></canvas>
-      </div>
-    </div>
-
-    <div class="chart-wrapper">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">DCA &amp; Lightning Program Holdings</div>
-          <div class="chart-legend" style="margin-top:10px">
-            <div class="legend-item"><div class="legend-swatch" style="background:#16a34a"></div>DCA Program</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#FACC15"></div>Lightning Node Yield</div>
-            <div class="legend-item" id="legend-cost-2" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #F97316;border-radius:50%"></div>Cumulative DCA Cost Basis</div>
-          </div>
-        </div>
-        <div class="toggle-group">
-          <button class="toggle-btn active" id="btn-btc-2" onclick="toggle2('btc')">BTC</button>
-          <button class="toggle-btn" id="btn-usd-2" onclick="toggle2('usd')">USD</button>
-        </div>
-      </div>
-      <div class="chart-canvas-container">
-        <canvas id="programChart"></canvas>
       </div>
     </div>
 
@@ -450,6 +446,7 @@
     Chart.register(ChartDataLabels);
 
     let mode = 'btc';
+    const visible = { initial: true, dca: true, lightning: true };
 
     const labels = [
       "Q4'20", "Q1'21", "Q4'21", "Q4'22", "Q4'23",
@@ -457,18 +454,11 @@
       "Q1'25", "Q2'25", "Q3'25", "Q4'25", "__CURRENT_LABEL__"
     ];
 
-    // End-of-period BTC price (USD)
     const btcPrice = [
       29001, 58918, 46306, 16547, 42265,
       69702, 60864, 65664, 92627,
       82356, 108397, 114309, 88445, __CURRENT_BTC_PRICE__
     ];
-
-    // --- BTC amounts by acquisition type ---
-    // Initial: 4,709 BTC (Oct 2020) + 3,318 BTC (Feb 2021) = 8,027 BTC
-    // Lightning Node Yield: ~11 BTC pre-tracked organic accumulation (2021–Q1'24),
-    //   plus MBR-tracked node yield starting May 2024 (~0.25 → 10.8 BTC by Sep'25)
-    // DCA: 10% of monthly BTC gross profit reinvested (started Apr 2024)
 
     const btcData = {
       initial:   [4709, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027, 8027],
@@ -482,38 +472,59 @@
       lightning: btcData.lightning.map((v, i) => v * btcPrice[i]),
     };
 
-    const btcTotals = labels.map((_, i) => btcData.initial[i] + btcData.dca[i] + btcData.lightning[i]);
-    const usdTotals = labels.map((_, i) => usdData.initial[i] + usdData.dca[i] + usdData.lightning[i]);
-
-    // Cumulative cost basis ($ actually invested) from MBR + public filings
-    const costBasis = [
-      50000000,    // Q4'20: initial $50M purchase
-      220099426,   // Q1'21: + $170M second purchase
-      220099426,   // Q4'21: no new investment
-      220099426,   // Q4'22: held through bear market
-      220099426,   // Q4'23: still holding
-      220099426,   // Q1'24: DCA not yet started
-      231479426,   // Q2'24: DCA begins
-      241129426,   // Q3'24
-      251359426,   // Q4'24
-      260679426,   // Q1'25
-      271499426,   // Q2'25
-      281299426,   // Q3'25
-      291000000,   // Q4'25
-      292600000,   // Mar'26*
+    const costBasisInitial = [
+      50000000, 220099426, 220099426, 220099426, 220099426,
+      220099426, 220099426, 220099426, 220099426,
+      220099426, 220099426, 220099426, 220099426, 220099426
+    ];
+    const costBasisDca = [
+      0, 0, 0, 0, 0,
+      0, 11380000, 21030000, 31260000,
+      40580000, 51400000, 61200000, 70900574, 72500574
     ];
 
     function fmtUsd(v) {
-      if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
-      if (v >= 1e6) return '$' + (v / 1e6).toFixed(0) + 'M';
-      if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+      if (Math.abs(v) >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+      if (Math.abs(v) >= 1e6) return '$' + (v / 1e6).toFixed(0) + 'M';
+      if (Math.abs(v) >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
       return '$' + v.toFixed(0);
     }
 
-    function fmtLabel(v) {
-      return mode === 'btc' ? v.toLocaleString() : fmtUsd(v);
+    function getVisibleTotals() {
+      const d = mode === 'btc' ? btcData : usdData;
+      return labels.map((_, i) => {
+        let t = 0;
+        if (visible.initial) t += d.initial[i];
+        if (visible.lightning) t += d.lightning[i];
+        if (visible.dca) t += d.dca[i];
+        return t;
+      });
     }
 
+    function getVisibleCostBasis() {
+      return labels.map((_, i) => {
+        let cb = 0;
+        if (visible.initial) cb += costBasisInitial[i];
+        if (visible.dca) cb += costBasisDca[i];
+        return cb;
+      });
+    }
+
+    function niceScale(maxVal, isBtc) {
+      if (maxVal <= 0) maxVal = 100;
+      if (isBtc) {
+        if (maxVal <= 50) return { max: 60, step: 10 };
+        if (maxVal <= 200) return { max: Math.ceil(maxVal / 50) * 50, step: 50 };
+        if (maxVal <= 1200) return { max: Math.ceil(maxVal / 200) * 200, step: 200 };
+        return { max: Math.ceil(maxVal / 2000) * 2000, step: 2000 };
+      }
+      if (maxVal <= 5e6) return { max: Math.ceil(maxVal / 1e6) * 1e6, step: 1e6 };
+      if (maxVal <= 5e7) return { max: Math.ceil(maxVal / 1e7) * 1e7, step: 1e7 };
+      if (maxVal <= 2e8) return { max: Math.ceil(maxVal / 2e7) * 2e7, step: 2e7 };
+      return { max: Math.ceil(maxVal / 2e8) * 2e8, step: 2e8 };
+    }
+
+    // datasets: 0=initial, 1=lightning, 2=dca, 3=cost basis line
     const ctx = document.getElementById('holdingsChart').getContext('2d');
 
     const chart = new Chart(ctx, {
@@ -590,15 +601,20 @@
         plugins: {
           legend: { display: false },
           datalabels: {
-            display: (ctx) => ctx.datasetIndex === 2,
+            display: function(ctx) {
+              if (ctx.datasetIndex === 3) return false;
+              const barIds = [0, 1, 2];
+              const topVisible = barIds.filter(i => !chart.data.datasets[i].hidden).pop();
+              return ctx.datasetIndex === topVisible;
+            },
             anchor: 'end',
             align: 'end',
             offset: 2,
             color: '#374151',
             font: { size: 11, weight: '600' },
-            formatter: (_, ctx) => {
-              const t = mode === 'btc' ? btcTotals : usdTotals;
-              return fmtLabel(t[ctx.dataIndex]);
+            formatter: function(_, ctx) {
+              const vt = getVisibleTotals();
+              return mode === 'btc' ? vt[ctx.dataIndex].toLocaleString() : fmtUsd(vt[ctx.dataIndex]);
             },
           },
           tooltip: {
@@ -610,30 +626,36 @@
             padding: 14,
             cornerRadius: 10,
             callbacks: {
-              afterTitle: (items) => {
+              afterTitle: function(items) {
                 return 'BTC Price: $' + btcPrice[items[0].dataIndex].toLocaleString();
               },
-              label: (ctx) => {
+              label: function(ctx) {
+                if (ctx.datasetIndex === 3) {
+                  if (ctx.parsed.y == null) return null;
+                  return ctx.dataset.label + ': ' + fmtUsd(ctx.parsed.y);
+                }
                 if (ctx.parsed.y === 0) return null;
-                const suffix = mode === 'btc' ? ' BTC' : '';
                 const val = mode === 'btc'
-                  ? ctx.parsed.y.toLocaleString() + suffix
+                  ? ctx.parsed.y.toLocaleString() + ' BTC'
                   : fmtUsd(ctx.parsed.y);
                 return ctx.dataset.label + ': ' + val;
               },
-              afterBody: (items) => {
+              afterBody: function(items) {
                 const i = items[0].dataIndex;
-                const t = mode === 'btc' ? btcTotals : usdTotals;
+                const vt = getVisibleTotals();
                 const val = mode === 'btc'
-                  ? t[i].toLocaleString() + ' BTC'
-                  : fmtUsd(t[i]);
-                let lines = ['\nMarket Value: ' + val];
+                  ? vt[i].toLocaleString() + ' BTC'
+                  : fmtUsd(vt[i]);
+                let lines = ['\nTotal (visible): ' + val];
                 if (mode === 'usd') {
-                  const cb = costBasis[i];
-                  const gain = usdTotals[i] - cb;
-                  const pct = ((gain / cb) * 100).toFixed(1);
-                  lines.push('Cost Basis: ' + fmtUsd(cb));
-                  lines.push('Gain/Loss: ' + (gain >= 0 ? '+' : '') + fmtUsd(gain) + ' (' + pct + '%)');
+                  const vcb = getVisibleCostBasis();
+                  const cb = vcb[i];
+                  if (cb > 0) {
+                    const gain = vt[i] - cb;
+                    const pct = ((gain / cb) * 100).toFixed(1);
+                    lines.push('Cost Basis: ' + fmtUsd(cb));
+                    lines.push('Gain/Loss: ' + (gain >= 0 ? '+' : '') + fmtUsd(gain) + ' (' + pct + '%)');
+                  }
                 }
                 return lines;
               },
@@ -643,8 +665,7 @@
       }
     });
 
-    function toggle(newMode) {
-      mode = newMode;
+    function updateChart() {
       const d = mode === 'btc' ? btcData : usdData;
       const costDs = chart.data.datasets[3];
 
@@ -652,221 +673,63 @@
       chart.data.datasets[1].data = [...d.lightning];
       chart.data.datasets[2].data = [...d.dca];
 
-      if (mode === 'btc') {
-        chart.options.scales.y.max = 10000;
-        chart.options.scales.y.ticks.stepSize = 2000;
-        chart.options.scales.y.title.text = 'BTC';
+      chart.data.datasets[0].hidden = !visible.initial;
+      chart.data.datasets[1].hidden = !visible.lightning;
+      chart.data.datasets[2].hidden = !visible.dca;
+
+      // Only the topmost visible bar gets rounded corners
+      const barIds = [0, 1, 2];
+      const topVisible = barIds.filter(i => !chart.data.datasets[i].hidden).pop();
+      barIds.forEach(i => {
+        chart.data.datasets[i].borderRadius = (i === topVisible)
+          ? { topLeft: 4, topRight: 4 } : 0;
+      });
+
+      const vt = getVisibleTotals();
+      const maxVal = Math.max(...vt, 1);
+      const scale = niceScale(maxVal, mode === 'btc');
+
+      chart.options.scales.y.max = scale.max;
+      chart.options.scales.y.ticks.stepSize = scale.step;
+      chart.options.scales.y.title.text = mode === 'btc' ? 'BTC' : 'USD (Market Value)';
+
+      if (mode === 'usd') {
+        const vcb = getVisibleCostBasis();
+        costDs.data = [...vcb];
+        costDs.hidden = false;
+        const cbMax = Math.max(...vcb);
+        if (cbMax > scale.max) {
+          const s2 = niceScale(Math.max(cbMax, maxVal), false);
+          chart.options.scales.y.max = s2.max;
+          chart.options.scales.y.ticks.stepSize = s2.step;
+        }
+      } else {
         costDs.data = labels.map(() => null);
         costDs.hidden = true;
-      } else {
-        const maxUsd = Math.max(...usdTotals);
-        chart.options.scales.y.max = Math.ceil(maxUsd / 2e8) * 2e8;
-        chart.options.scales.y.ticks.stepSize = 2e8;
-        chart.options.scales.y.title.text = 'USD (Market Value)';
-        costDs.data = [...costBasis];
-        costDs.hidden = false;
       }
 
-      chart.update();
+      document.getElementById('legend-initial').classList.toggle('dimmed', !visible.initial);
+      document.getElementById('legend-dca').classList.toggle('dimmed', !visible.dca);
+      document.getElementById('legend-lightning').classList.toggle('dimmed', !visible.lightning);
+      document.getElementById('legend-cost').style.display = mode === 'usd' ? 'flex' : 'none';
 
       document.getElementById('btn-btc').classList.toggle('active', mode === 'btc');
       document.getElementById('btn-usd').classList.toggle('active', mode === 'usd');
-      document.getElementById('legend-cost').style.display = mode === 'usd' ? 'flex' : 'none';
+
+      chart.update();
     }
 
-    // ---- Chart 2: DCA + Lightning Only ----
-    let mode2 = 'btc';
+    function toggleDataset(key) {
+      const keys = ['initial', 'dca', 'lightning'];
+      const othersAllHidden = keys.filter(k => k !== key).every(k => !visible[k]);
+      if (visible[key] && othersAllHidden) return;
+      visible[key] = !visible[key];
+      updateChart();
+    }
 
-    const labels2 = [
-      "Q1'24", "Q2'24", "Q3'24", "Q4'24",
-      "Q1'25", "Q2'25", "Q3'25", "Q4'25", "__CURRENT_LABEL__"
-    ];
-
-    const btcPrice2 = [
-      69702, 60864, 65664, 92627,
-      82356, 108397, 114309, 88445, __CURRENT_BTC_PRICE__
-    ];
-
-    const btcData2 = {
-      dca:       [0,   173, 324, 444, 541, 646, 746, 833, 833],
-      lightning: [11,  11,  12,  14,  16,  19,  22,  23,  23],
-    };
-
-    const usdData2 = {
-      dca:       btcData2.dca.map((v, i) => v * btcPrice2[i]),
-      lightning: btcData2.lightning.map((v, i) => v * btcPrice2[i]),
-    };
-
-    const btcTotals2 = labels2.map((_, i) => btcData2.dca[i] + btcData2.lightning[i]);
-    const usdTotals2 = labels2.map((_, i) => usdData2.dca[i] + usdData2.lightning[i]);
-
-    const costBasis2 = [
-      0,          // Q1'24: DCA not yet started
-      11380000,   // Q2'24
-      21030000,   // Q3'24
-      31260000,   // Q4'24
-      40580000,   // Q1'25
-      51400000,   // Q2'25
-      61200000,   // Q3'25
-      70900574,   // Q4'25
-      72500574,   // Mar'26*
-    ];
-
-    const ctx2 = document.getElementById('programChart').getContext('2d');
-
-    const chart2 = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: labels2,
-        datasets: [
-          {
-            label: 'Lightning Node Yield',
-            data: [...btcData2.lightning],
-            backgroundColor: '#FACC15',
-          },
-          {
-            label: 'DCA Program',
-            data: [...btcData2.dca],
-            backgroundColor: '#16a34a',
-            borderRadius: { topLeft: 4, topRight: 4 },
-          },
-          {
-            type: 'line',
-            label: 'DCA Cost Basis ($ Invested)',
-            data: labels2.map(() => null),
-            borderColor: '#F97316',
-            borderWidth: 3,
-            pointBackgroundColor: '#ffffff',
-            pointBorderColor: '#F97316',
-            pointBorderWidth: 2.5,
-            pointRadius: 5,
-            pointHoverRadius: 8,
-            fill: false,
-            tension: 0.2,
-            hidden: true,
-            order: -1,
-            datalabels: { display: false },
-          },
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { intersect: false, mode: 'index' },
-        scales: {
-          x: {
-            stacked: true,
-            grid: { color: 'rgba(0,0,0,0.04)' },
-            ticks: { color: '#6b7280', font: { size: 12, weight: '500' } },
-            border: { color: '#dde0e6' },
-          },
-          y: {
-            stacked: true,
-            min: 0,
-            max: 1000,
-            grid: { color: 'rgba(0,0,0,0.06)' },
-            ticks: {
-              color: '#6b7280',
-              font: { size: 12 },
-              callback: v => mode2 === 'btc' ? v.toLocaleString() : fmtUsd(v),
-              stepSize: 200,
-            },
-            border: { color: '#dde0e6' },
-            title: {
-              display: true,
-              text: 'BTC',
-              color: '#6b7280',
-              font: { size: 13, weight: '500' },
-            },
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          datalabels: {
-            display: (ctx) => ctx.datasetIndex === 1,
-            anchor: 'end',
-            align: 'end',
-            offset: 2,
-            color: '#374151',
-            font: { size: 11, weight: '600' },
-            formatter: (_, ctx) => {
-              const t = mode2 === 'btc' ? btcTotals2 : usdTotals2;
-              return mode2 === 'btc' ? t[ctx.dataIndex].toLocaleString() : fmtUsd(t[ctx.dataIndex]);
-            },
-          },
-          tooltip: {
-            backgroundColor: '#ffffff',
-            borderColor: '#dde0e6',
-            borderWidth: 1,
-            titleColor: '#1a1a2e',
-            bodyColor: '#374151',
-            padding: 14,
-            cornerRadius: 10,
-            callbacks: {
-              afterTitle: (items) => {
-                return 'BTC Price: $' + btcPrice2[items[0].dataIndex].toLocaleString();
-              },
-              label: (ctx) => {
-                if (ctx.parsed.y === 0) return null;
-                const suffix = mode2 === 'btc' ? ' BTC' : '';
-                const val = mode2 === 'btc'
-                  ? ctx.parsed.y.toLocaleString() + suffix
-                  : fmtUsd(ctx.parsed.y);
-                return ctx.dataset.label + ': ' + val;
-              },
-              afterBody: (items) => {
-                const i = items[0].dataIndex;
-                const t = mode2 === 'btc' ? btcTotals2 : usdTotals2;
-                const val = mode2 === 'btc'
-                  ? t[i].toLocaleString() + ' BTC'
-                  : fmtUsd(t[i]);
-                let lines = ['\nTotal DCA + LN: ' + val];
-                if (mode2 === 'usd') {
-                  const cb = costBasis2[i];
-                  if (cb > 0) {
-                    const gain = usdTotals2[i] - cb;
-                    const pct = ((gain / cb) * 100).toFixed(1);
-                    lines.push('DCA Cost Basis: ' + fmtUsd(cb));
-                    lines.push('Gain/Loss: ' + (gain >= 0 ? '+' : '') + fmtUsd(gain) + ' (' + pct + '%)');
-                  }
-                  lines.push('\nLightning yield has $0 cost basis (earned via routing fees)');
-                }
-                return lines;
-              },
-            }
-          }
-        }
-      }
-    });
-
-    function toggle2(newMode) {
-      mode2 = newMode;
-      const d = mode2 === 'btc' ? btcData2 : usdData2;
-      const costDs2 = chart2.data.datasets[2];
-
-      chart2.data.datasets[0].data = [...d.lightning];
-      chart2.data.datasets[1].data = [...d.dca];
-
-      if (mode2 === 'btc') {
-        chart2.options.scales.y.max = 1000;
-        chart2.options.scales.y.ticks.stepSize = 200;
-        chart2.options.scales.y.title.text = 'BTC';
-        costDs2.data = labels2.map(() => null);
-        costDs2.hidden = true;
-      } else {
-        const maxUsd2 = Math.max(...usdTotals2);
-        chart2.options.scales.y.max = Math.ceil(maxUsd2 / 2e7) * 2e7;
-        chart2.options.scales.y.ticks.stepSize = 2e7;
-        chart2.options.scales.y.title.text = 'USD (Market Value)';
-        costDs2.data = [...costBasis2];
-        costDs2.hidden = false;
-      }
-
-      chart2.update();
-
-      document.getElementById('btn-btc-2').classList.toggle('active', mode2 === 'btc');
-      document.getElementById('btn-usd-2').classList.toggle('active', mode2 === 'usd');
-      document.getElementById('legend-cost-2').style.display = mode2 === 'usd' ? 'flex' : 'none';
+    function toggle(newMode) {
+      mode = newMode;
+      updateChart();
     }
   </script>
 </body>
