@@ -8,16 +8,16 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --surface-2: #1a1a26;
-      --border: #2a2a3a;
-      --text: #e8e8f0;
-      --text-muted: #8888a0;
-      --accent: #f7931a;
-      --accent-dim: rgba(247, 147, 26, 0.15);
-      --green: #00d67e;
-      --red: #ff4d6a;
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface-2: #eef0f3;
+      --border: #dde0e6;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #1a1a2e;
+      --accent-dim: rgba(26, 26, 46, 0.08);
+      --green: #16a34a;
+      --red: #dc2626;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,7 +51,7 @@
     .btc-icon {
       width: 40px;
       height: 40px;
-      background: var(--accent);
+      background: #1a1a2e;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -102,8 +102,12 @@
       font-weight: 700;
     }
 
-    .stat-value.accent { color: var(--accent); }
+    .stat-value.accent { color: #1a1a2e; }
     .stat-value.green { color: var(--green); }
+
+    .stat-card {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
 
     .stat-sub {
       font-size: 0.82rem;
@@ -183,8 +187,16 @@
     .toggle-btn:hover { color: var(--text); }
 
     .toggle-btn.active {
-      background: var(--accent);
+      background: #1a1a2e;
       color: #fff;
+    }
+
+    .chart-wrapper {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .timeline {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
 
     .timeline {
@@ -233,8 +245,8 @@
 
     .badge {
       display: inline-block;
-      background: var(--accent-dim);
-      color: var(--accent);
+      background: #eef2ff;
+      color: #4338ca;
       font-size: 0.75rem;
       font-weight: 600;
       padding: 3px 10px;
@@ -497,7 +509,7 @@
             data: labels.map(() => null),
             borderColor: '#F97316',
             borderWidth: 3,
-            pointBackgroundColor: '#1a1a26',
+            pointBackgroundColor: '#ffffff',
             pointBorderColor: '#F97316',
             pointBorderWidth: 2.5,
             pointRadius: 5,
@@ -517,26 +529,26 @@
         scales: {
           x: {
             stacked: true,
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { color: '#8888a0', font: { size: 12, weight: '500' } },
-            border: { color: 'rgba(255,255,255,0.08)' },
+            grid: { color: 'rgba(0,0,0,0.04)' },
+            ticks: { color: '#6b7280', font: { size: 12, weight: '500' } },
+            border: { color: '#dde0e6' },
           },
           y: {
             stacked: true,
             min: 0,
             max: 10000,
-            grid: { color: 'rgba(255,255,255,0.05)' },
+            grid: { color: 'rgba(0,0,0,0.06)' },
             ticks: {
-              color: '#8888a0',
+              color: '#6b7280',
               font: { size: 12 },
               callback: v => mode === 'btc' ? v.toLocaleString() : fmtUsd(v),
               stepSize: 2000,
             },
-            border: { color: 'rgba(255,255,255,0.08)' },
+            border: { color: '#dde0e6' },
             title: {
               display: true,
               text: 'BTC',
-              color: '#8888a0',
+              color: '#6b7280',
               font: { size: 13, weight: '500' },
             },
           }
@@ -548,7 +560,7 @@
             anchor: 'end',
             align: 'end',
             offset: 2,
-            color: '#c8c8d8',
+            color: '#374151',
             font: { size: 11, weight: '600' },
             formatter: (_, ctx) => {
               const t = mode === 'btc' ? btcTotals : usdTotals;
@@ -556,11 +568,11 @@
             },
           },
           tooltip: {
-            backgroundColor: '#1a1a26',
-            borderColor: '#3a3a4a',
+            backgroundColor: '#ffffff',
+            borderColor: '#dde0e6',
             borderWidth: 1,
-            titleColor: '#e8e8f0',
-            bodyColor: '#e8e8f0',
+            titleColor: '#1a1a2e',
+            bodyColor: '#374151',
             padding: 14,
             cornerRadius: 10,
             callbacks: {
