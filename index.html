@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Block's Bitcoin Holdings Over Time</title>
+  <title>Block's Bitcoin Corporate Treasury</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <style>
@@ -48,17 +48,10 @@
       margin-bottom: 12px;
     }
 
-    .btc-icon {
-      width: 40px;
-      height: 40px;
-      background: #1a1a2e;
-      border-radius: 50%;
+    .block-logo {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 22px;
-      color: #fff;
+      gap: 4px;
     }
 
     h1 {
@@ -273,8 +266,13 @@
   <div class="container">
     <header>
       <div class="logo-row">
-        <div class="btc-icon">&#8383;</div>
-        <h1>Block's <span>Bitcoin</span> Treasury</h1>
+        <div class="block-logo">
+          <svg width="38" height="38" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="8" width="24" height="24" rx="3" transform="rotate(45 20 20)" fill="#1a1a2e"/>
+            <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="16" font-weight="800" font-family="-apple-system,sans-serif">&#8383;</text>
+          </svg>
+        </div>
+        <h1>Block's Bitcoin Corporate Treasury</h1>
       </div>
       <p class="subtitle">Corporate BTC holdings from first purchase to today</p>
     </header>
@@ -305,10 +303,10 @@
     <div class="chart-wrapper">
       <div class="chart-header">
         <div>
-          <div class="chart-title">BTC Holdings Over Time — By Acquisition Type</div>
+          <div class="chart-title">Corporate Treasury Holdings — By Acquisition Type</div>
           <div class="chart-legend" style="margin-top:10px">
             <div class="legend-item"><div class="legend-swatch" style="background:#5B93D3"></div>Lump Sum Purchases</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#1e3a5f"></div>DCA Program</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#16a34a"></div>DCA Program</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#FACC15"></div>Lightning Node Yield</div>
             <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #F97316;border-radius:50%"></div>Cumulative Cost Basis</div>
           </div>
@@ -500,7 +498,7 @@
           {
             label: 'DCA Program',
             data: [...btcData.dca],
-            backgroundColor: '#1e3a5f',
+            backgroundColor: '#16a34a',
             borderRadius: { topLeft: 4, topRight: 4 },
           },
           {
