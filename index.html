@@ -68,6 +68,35 @@
       margin-top: 6px;
     }
 
+    .ranking-badges {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #4338ca;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .rank-badge:hover {
+      background: #e0e7ff;
+      border-color: #a5b4fc;
+    }
+
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -336,6 +365,16 @@
       padding: 32px 0 16px;
       color: var(--text-muted);
       font-size: 0.8rem;
+      line-height: 1.8;
+    }
+
+    footer a {
+      color: #4338ca;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
 
     @media (max-width: 600px) {
@@ -365,7 +404,10 @@
         </div>
         <h1>Block's Bitcoin Corporate Treasury</h1>
       </div>
-      <p class="subtitle"></p>
+      <div class="ranking-badges">
+        <a href="https://bitcointreasuries.net/" target="_blank" rel="noopener" class="rank-badge">#__RANK_OVERALL__ Largest BTC Corporate Treasury<sup>1</sup></a>
+        <a href="https://bitcointreasuries.net/" target="_blank" rel="noopener" class="rank-badge">#__RANK_NONMINER__ Among Non-Miners &amp; Non-BTC DATs<sup>2</sup></a>
+      </div>
     </header>
 
     <div class="stats-grid">
@@ -397,7 +439,7 @@
           <div class="chart-title">Corporate Treasury Holdings — By Acquisition Type</div>
           <div class="chart-legend" style="margin-top:10px">
             <div class="legend-item clickable" id="legend-initial" onclick="toggleDataset('initial')"><div class="legend-swatch" style="background:#5B93D3"></div>Lump Sum Purchases</div>
-            <div class="legend-item clickable" id="legend-dca" onclick="toggleDataset('dca')"><div class="legend-swatch" style="background:#16a34a"></div>DCA Program*</div>
+            <div class="legend-item clickable" id="legend-dca" onclick="toggleDataset('dca')"><div class="legend-swatch" style="background:#16a34a"></div>DCA Program<sup>3</sup></div>
             <div class="legend-item clickable" id="legend-lightning" onclick="toggleDataset('lightning')"><div class="legend-swatch" style="background:#FACC15"></div>Lightning Node Yield</div>
             <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #F97316;border-radius:50%"></div>Cost Basis (visible)</div>
           </div>
@@ -420,7 +462,7 @@
           <tr>
             <th>Period</th>
             <th class="col-lump">Lump Sum</th>
-            <th class="col-dca">DCA Program*</th>
+            <th class="col-dca">DCA Program<sup>3</sup></th>
             <th class="col-ln">Lightning Yield</th>
             <th>Total</th>
           </tr>
@@ -596,11 +638,14 @@
     </div>
 
     <div class="footnote">
-      *DCA Program: Block invests 10% of monthly Bitcoin gross profit into BTC purchases. Announced in the <a href="https://s29.q4cdn.com/628966176/files/doc_financials/2024/q1/Shareholder-Letter_1Q24_Block.pdf" target="_blank" rel="noopener">Q1 2024 Shareholder Letter</a>.
+      <sup>1</sup>Ranked by BTC holdings among all publicly traded companies per <a href="https://bitcointreasuries.net/" target="_blank" rel="noopener">BitcoinTreasuries.net</a>.<br>
+      <sup>2</sup>Excludes Bitcoin miners (e.g. MARA, Riot, CleanSpark) and pure-play BTC treasury companies (e.g. Strategy, Twenty One Capital, Metaplanet, Strive) whose primary business is accumulating Bitcoin. Block ranks behind Bullish, Coinbase, Tesla, and Trump Media.<br>
+      <sup>3</sup>DCA Program: Block invests 10% of monthly Bitcoin gross profit into BTC purchases. Announced in the <a href="https://s29.q4cdn.com/628966176/files/doc_financials/2024/q1/Shareholder-Letter_1Q24_Block.pdf" target="_blank" rel="noopener">Q1 2024 Shareholder Letter</a>.
     </div>
 
     <footer>
-      Data sourced from Block's SEC filings, shareholder letters, and public disclosures. Price updated __LAST_UPDATED__.
+      Data sourced from Block's SEC filings, shareholder letters, and public disclosures. Intra-quarter data is based on internal records. Price updated __LAST_UPDATED__.<br>
+      See Block's official Bitcoin holdings page at <a href="https://bitcoin.block.xyz/" target="_blank" rel="noopener">bitcoin.block.xyz</a>.
     </footer>
   </div>
 
