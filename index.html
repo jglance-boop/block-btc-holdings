@@ -295,10 +295,10 @@
         <div>
           <div class="chart-title">BTC Holdings Over Time — By Acquisition Type</div>
           <div class="chart-legend" style="margin-top:10px">
-            <div class="legend-item"><div class="legend-swatch" style="background:#5B93D3"></div>Initial Purchases</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#F7931A"></div>DCA Program</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#A855F7"></div>Lightning Node Yield</div>
-            <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #2563EB;border-radius:50%"></div>Cumulative Cost Basis</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#5B93D3"></div>Lump Sum Purchases</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#1e3a5f"></div>DCA Program</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#FACC15"></div>Lightning Node Yield</div>
+            <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #F97316;border-radius:50%"></div>Cumulative Cost Basis</div>
           </div>
         </div>
         <div class="toggle-group">
@@ -476,35 +476,36 @@
         labels,
         datasets: [
           {
-            label: 'Initial Purchases',
+            label: 'Lump Sum Purchases',
             data: [...btcData.initial],
             backgroundColor: '#5B93D3',
           },
           {
             label: 'Lightning Node Yield',
             data: [...btcData.lightning],
-            backgroundColor: '#A855F7',
+            backgroundColor: '#FACC15',
           },
           {
             label: 'DCA Program',
             data: [...btcData.dca],
-            backgroundColor: '#F7931A',
+            backgroundColor: '#1e3a5f',
             borderRadius: { topLeft: 4, topRight: 4 },
           },
           {
             type: 'line',
             label: 'Cost Basis ($ Invested)',
             data: labels.map(() => null),
-            borderColor: '#2563EB',
-            borderWidth: 2.5,
-            pointBackgroundColor: '#1a3a5c',
-            pointBorderColor: '#2563EB',
-            pointBorderWidth: 2,
+            borderColor: '#F97316',
+            borderWidth: 3,
+            pointBackgroundColor: '#1a1a26',
+            pointBorderColor: '#F97316',
+            pointBorderWidth: 2.5,
             pointRadius: 5,
             pointHoverRadius: 8,
             fill: false,
             tension: 0.2,
             hidden: true,
+            order: -1,
             datalabels: { display: false },
           },
         ]
