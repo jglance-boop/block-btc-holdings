@@ -9,8 +9,8 @@ from datetime import datetime, timezone
 
 TEMPLATE = "index.html"
 OUTPUT_DIR = "dist"
-TOTAL_BTC = 8883
-COST_BASIS = 292_600_000
+TOTAL_BTC = 9003
+COST_BASIS = 302_300_000
 
 COINGECKO_URL = (
     "https://api.coingecko.com/api/v3/simple/price"
