@@ -298,7 +298,7 @@
             <div class="legend-item"><div class="legend-swatch" style="background:#5B93D3"></div>Initial Purchases</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#F7931A"></div>DCA Program</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#A855F7"></div>Lightning Node Yield</div>
-            <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="border:2px dashed #00d67e;background:none"></div>Cumulative Cost Basis</div>
+            <div class="legend-item" id="legend-cost" style="display:none"><div class="legend-swatch" style="background:#1a3a5c;border:2px solid #2563EB;border-radius:50%"></div>Cumulative Cost Basis</div>
           </div>
         </div>
         <div class="toggle-group">
@@ -495,13 +495,13 @@
             type: 'line',
             label: 'Cost Basis ($ Invested)',
             data: labels.map(() => null),
-            borderColor: '#00d67e',
+            borderColor: '#2563EB',
             borderWidth: 2.5,
-            borderDash: [8, 4],
-            pointBackgroundColor: '#00d67e',
-            pointBorderColor: '#00d67e',
-            pointRadius: 3,
-            pointHoverRadius: 6,
+            pointBackgroundColor: '#1a3a5c',
+            pointBorderColor: '#2563EB',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 8,
             fill: false,
             tension: 0.2,
             hidden: true,
